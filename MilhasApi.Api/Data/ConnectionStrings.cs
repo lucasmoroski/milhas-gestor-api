@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace MilhasApi.Api.Data;
 
 public static class ConnectionStrings
@@ -10,7 +12,7 @@ public static class ConnectionStrings
     {
         if (!value.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) &&
             !value.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
-            return value;
+            return UseDirectNeonHost(value);
 
         var uri = new Uri(value);
         var userInfo = uri.UserInfo.Split(':', 2);
@@ -23,6 +25,14 @@ public static class ConnectionStrings
         var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
         if (string.Equals(query["sslmode"], "disable", StringComparison.OrdinalIgnoreCase)) ssl = "Disable";
 
-        return $"Host={uri.Host};Port={port};Database={database};Username={user};Password={password};SSL Mode={ssl};Trust Server Certificate=true";
+        return UseDirectNeonHost(
+            $"Host={uri.Host};Port={port};Database={database};Username={user};Password={password};SSL Mode={ssl};Trust Server Certificate=true");
     }
+
+    /// <summary>
+    /// O pooler do Neon (host '...-pooler...', PgBouncer em modo transação) não suporta os locks de sessão
+    /// usados pelas migrations do EF Core. Usa-se sempre o endpoint direto, que é o mesmo host sem '-pooler'.
+    /// </summary>
+    private static string UseDirectNeonHost(string connectionString) =>
+        Regex.Replace(connectionString, @"(?i)(host\s*=\s*[^;]*?)-pooler\.", "$1.");
 }
