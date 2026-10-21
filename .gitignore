@@ -1,0 +1,25 @@
+# DADOS REAIS DE CLIENTES (PII + senhas de programas): nunca versionar
+milhas_tech_data/
+milhas_tech_data*.zip
+*.zip
+__MACOSX/
+*.csv
+
+# segredos locais
+.env
+.env.*
+!.env.example
+!.env.production.example
+appsettings.Local.json
+appsettings.*.Local.json
+*.pfx
+
+# build / dependências
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+.vs/
+.idea/
+*.user
+*.log

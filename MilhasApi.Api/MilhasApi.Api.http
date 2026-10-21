@@ -1,0 +1,6 @@
+@MilhasApi.Api_HostAddress = http://localhost:5229
+
+GET {{MilhasApi.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

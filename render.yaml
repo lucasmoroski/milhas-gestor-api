@@ -1,0 +1,34 @@
+# Blueprint do Render (plano gratuito). Cria o serviço da API a partir do Dockerfile.
+# Valores marcados com "sync: false" são pedidos no painel na criação (nunca ficam no Git).
+services:
+  - type: web
+    name: milhas-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Database__Provider
+        value: Postgres
+      # String de conexão do Neon (formato postgresql://usuario:senha@host/banco?sslmode=require)
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      # Segredo de 32+ caracteres para assinar os tokens de login
+      - key: Jwt__Key
+        generateValue: true
+      # Chave que criptografa as senhas dos programas de milhas. Precisa ser a MESMA usada na importação dos dados.
+      - key: Crypto__Key
+        sync: false
+      # Conta administradora criada no primeiro start (escolha e-mail e senha fortes)
+      - key: Seed__AdminEmail
+        sync: false
+      - key: Seed__AdminPassword
+        sync: false
+      # URL do front-end publicado (ex.: https://milhas-gestor.vercel.app), sem barra no final
+      - key: Cors__AllowedOrigins__0
+        sync: false
